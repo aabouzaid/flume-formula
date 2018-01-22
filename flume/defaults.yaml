@@ -1,0 +1,50 @@
+Defaults:
+  user: flume
+  group: flume
+
+  download:
+    version: 1.8.0
+    mirror: https://artfiles.org/apache.org/flume
+    hash:
+      url: http://www.apache.org/dist/flume
+      type: sha1
+    path: /tmp
+
+  dirs:
+    prefix: /opt/flume
+    conf: /etc/flume
+    log: /var/log/flume
+
+  env:
+    java:
+      home: ''
+      opts:
+        heap:
+          - '-Xms125m'
+          - '-Xmx250m'
+        jmx:
+          - '-Dcom.sun.management.jmxremote'
+        log:
+          - '-Dorg.apache.flume.log.rawdata=true'
+          - '-Dorg.apache.flume.log.printconfig=true'
+        mon:
+          - '-Dflume.monitoring.type=http'
+          - '-Dflume.monitoring.port=34546'
+        extra: []
+    classpath: []
+
+  service:
+    name: flume
+    provider: ''
+    systemd:
+      dir: /etc/systemd/system
+      file_extension: service
+      vars:
+        restart: always
+        restart_sec: 5
+    # This formula doesn't support init/upstream yet.
+    #init:
+    #  dir: /etc/init.d/flume
+
+  plugins: {}
+  agents: {}
