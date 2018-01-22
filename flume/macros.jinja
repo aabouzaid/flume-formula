@@ -1,0 +1,41 @@
+# Flatten dict in dot notation style.
+{%- macro flatten(target_dict, parent_key='', separator=".") -%}
+
+  {%- set items_list = [] -%}
+  {%- for key, value in target_dict.items() -%}
+    {%- set new_key = '%s%s%s' % (parent_key, separator, key) if parent_key else key -%}
+    {%- if value is mapping -%}
+      {{ flatten(value, new_key, separator=separator) }}
+    {%- else -%}
+      {%- do items_list.append((new_key, value)) -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- for key, value in items_list -%}
+    {{ key }} = {{ "%s\n" % value }}
+  {%- endfor -%}
+
+{%- endmacro -%}
+
+# Format Flume agent properties.
+{%- macro formatAgent(agent_name, agent_vars) -%}
+
+  {{ "\n\n# Main.\n" }}
+  {%- for section_name, section_vars in agent_vars.items() -%}
+    {%- set section_keys = agent_vars[section_name].keys() | join(" ") -%}
+    {{- "%s.%s" % (agent_name, section_name) }} = {{ "%s\n" % section_keys }}
+  {%- endfor -%}
+
+  {%- for section_name, section_vars in agent_vars.items() -%}
+    {{ "\n\n# %s.\n" % (section_name | capitalize) }}
+    {%- for conf_name, conf_vars in section_vars.items() -%}
+      {#- Set section -#}
+      {{ "\n# %s.\n" % (conf_name | capitalize) }}
+      {#- Flatten config with dot notation -#}
+      {%- set section_path = "%s.%s" % (agent_name, section_name) -%}
+      {%- set conf_path = "%s.%s" % (section_path, conf_name) -%}
+      {{- flatten(conf_vars, parent_key=conf_path, separator=".") }}
+    {%- endfor -%}
+  {%- endfor -%}
+
+{%- endmacro -%}
