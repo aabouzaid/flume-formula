@@ -1,0 +1,64 @@
+{% import_yaml 'flume/defaults.yaml' as defaultmap %}
+
+# Defaults.
+{% set defaults = salt['grains.filter_by'](
+    defaultmap,
+    base='Defaults',
+) %}
+
+# Final var merged with pillar.
+{% set flume = salt['pillar.get'](
+    'flume',
+    default=defaults,
+    merge=True,
+) %}
+
+# Update dynamic vars.
+{% do salt['defaults.merge'](flume, {
+    'download': {
+        'file': "apache-flume-%s-bin.tar.gz" % flume.download.version
+    },
+    'dirs': {
+        'install': "%s/flume-%s" % (flume.dirs.prefix, flume.download.version),
+        'plugins_d': "%s/current/plugins.d" % flume.dirs.prefix,
+    },
+    'service': {
+        'provider': salt['grains.get']('init')
+    },
+}) %}
+
+# Another level of dynamic vars.
+{% do salt['defaults.merge'](flume, {
+    'download': {
+        'source': "%(mirror)s/%(version)s/%(file)s" % {
+                    'mirror': flume.download.mirror,
+                    'version': flume.download.version,
+                    'file': flume.download.file
+                  },
+        'hash': {
+          'value': flume.download.hash.value | default(
+                   "%(url)s/%(version)s/%(file)s.%(type)s" % {
+                     'url': flume.download.hash.url,
+                     'version': flume.download.version,
+                     'file': flume.download.file,
+                     'type': flume.download.hash.type
+                   }
+          )
+        },
+    },
+    'service': {
+        'conf': flume.service[flume.service.provider]
+    },
+}) %}
+
+# Update classpath with extra plugins.
+# In case the plugin doesn't follow Flume plugins convention.
+{% for plugin_name, plugin_vars in flume.plugins.items() %}
+    {% for path_name, path_conf in plugin_vars.pathes.items() %}
+        {% for classpath in path_conf.classpath | default([]) %}
+            {% do flume.env.classpath.append(
+                '%s/%s/%s/%s' % (flume.dirs.plugins_d, plugin_name, path_conf.dest, classpath)
+            ) %}
+        {% endfor %}
+    {% endfor %}
+{% endfor %}
