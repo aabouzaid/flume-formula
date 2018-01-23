@@ -1,0 +1,44 @@
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# If this file is placed at FLUME_CONF_DIR/flume-env.sh, it will be sourced
+# during Flume startup.
+
+# Enviroment variables can be set here.
+{% if env.java.home -%}
+export JAVA_HOME={{ env.java.home }}
+{%- endif %}
+
+# Heap.
+export JAVA_OPTS="{%- for opt in env.java.opts.heap -%}{{ opt }} {% endfor -%}"
+
+# JMX.
+export JAVA_OPTS="$JAVA_OPTS {% for opt in env.java.opts.jmx -%}{{ opt }} {% endfor -%}"
+
+# Logging.
+# Let Flume write raw event data and configuration information to its log files for debugging
+# purposes. Enabling these flags is not recommended in production,
+# as it may result in logging sensitive user information or encryption secrets.
+export JAVA_OPTS="$JAVA_OPTS {% for opt in env.java.opts.log -%}{{ opt }} {% endfor -%}"
+
+{% if env.java.opts.mon -%}
+# Monitoring.
+export JAVA_OPTS="$JAVA_OPTS {% for opt in env.java.opts.mon -%}{{ opt }} {% endfor -%}"
+{%- endif %}
+
+{% if env.java.opts.extra -%}
+# Extra.
+export JAVA_OPTS="$JAVA_OPTS {% for opt in env.java.opts.extra -%}{{ opt }} {% endfor -%}"
+{%- endif -%}
+
+{% if env.classpath -%}
+# Note that the Flume conf directory is always included in the classpath.
+FLUME_CLASSPATH="
+{%- for classpath in env.classpath -%}
+  {{ classpath }}{% if not loop.last %}:{% endif %}
+{%- endfor -%}
+"
+{%- endif -%}

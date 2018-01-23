@@ -1,0 +1,16 @@
+[Unit]
+Description=Apache Flume Application On %I
+After=network.target
+
+[Service]
+Type=simple
+User={{ cfg.user }}
+SyslogIdentifier={{ cfg.service.name }}
+Restart={{ service.conf.vars.restart }}
+RestartSec={{ service.conf.vars.restart_sec }}
+PIDFile=/var/run/{{ cfg.service.name }}/%i.pid
+WorkingDirectory={{ cfg.dirs.prefix }}/current
+ExecStart=/bin/bash -c '{{ cfg.dirs.prefix }}/current/bin/flume-ng agent -n {{ cfg.service.name }} -c {{ cfg.dirs.conf }} -f {{ cfg.dirs.conf }}/*.properties'
+
+[Install]
+WantedBy=multi-user.target
