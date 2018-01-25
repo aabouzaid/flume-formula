@@ -8,6 +8,12 @@ driver:
 platforms:
   - name: centos-7
     driver_config:
+      provision_command:
+        # There is a bug in py 2.7.5 tarfile module as described here
+        # https://github.com/saltstack/salt/issues/41385#issuecomment-303768986
+        # And since this test means to test the formula againest the system in general,
+        # So it's fixed manualy here.
+        - "sed -i 's/nts(s) or/nts(s).strip() or/' /usr/lib64/python2.7/tarfile.py"
       run_command: /lib/systemd/systemd
   - name: ubuntu-16.04
     driver_config:
