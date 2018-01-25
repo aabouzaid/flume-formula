@@ -1,0 +1,98 @@
+flume:
+  user: flume
+  group: flume
+
+  download:
+    version: 1.8.0
+    mirror: https://artfiles.org/apache.org/flume
+    hash:
+      url: http://www.apache.org/dist/flume
+      type: sha1
+    path: /tmp
+
+  dirs:
+    prefix: /opt/flume
+    conf: /etc/flume
+    log: /var/log/flume
+
+  env:
+    java:
+      home: ''
+      opts:
+        heap:
+          - '-Xms125m'
+          - '-Xmx250m'
+        jmx:
+          - '-Dcom.sun.management.jmxremote'
+        log:
+          - '-Dorg.apache.flume.log.rawdata=true'
+          - '-Dorg.apache.flume.log.printconfig=true'
+        mon:
+          - '-Dflume.monitoring.type=http'
+          - '-Dflume.monitoring.port=34546'
+        extra: []
+    classpath: []
+
+  service:
+    name: flume
+    provider: ''
+    systemd:
+      dir: /etc/systemd/system
+      file_extension: service
+      vars:
+        restart: always
+        restart_sec: 3
+    init:
+      dir: /etc/init.d/flume
+
+  plugins:
+    hadoop:
+      source: https://archive.apache.org/dist/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
+      hash: False
+      pathes:
+        hdfs:
+          src: share/hadoop/hdfs
+          dest: hdfs
+          # Expose classpath dirs,
+          # in case the plugin doesn't follow Flume plugins convention.
+          classpath:
+            - '*'
+            - 'lib/*'
+        common:
+          src: share/hadoop/common
+          dest: common
+          classpath:
+            - '*'
+            - 'lib/*'
+
+  agents:
+    agent01:
+      sources:
+        httpSource:
+          type: http
+          port: 8080
+      channels:
+        httpChannel01:
+          type: memory
+          capacity: 1000000
+          transactionCapacity: 100000
+        nullChannel01:
+          type: memory
+          capacity: 1000
+          transactionCapacity: 1000
+      sinks:
+        httpFileSink01:
+          type: file_roll
+          channel: httpChannel01
+          sink:
+            directory: /var/log/flume
+            rollInterval: 300
+        nullSink01:
+          type: 'null'
+          channel: nullChannel01
+      sinkgroups:
+        sinkgroup01:
+          processor:
+            type: failover
+            backoff: 'false'
+            selector: failover
