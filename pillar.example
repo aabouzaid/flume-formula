@@ -49,7 +49,7 @@ flume:
     hadoop:
       source: https://archive.apache.org/dist/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
       hash: False
-      pathes:
+      paths:
         hdfs:
           src: share/hadoop/hdfs
           dest: hdfs

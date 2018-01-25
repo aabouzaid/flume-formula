@@ -24,8 +24,8 @@
     - group: {{ flume.group }}
     - if_missing: {{ flume.download.path }}/{{ plugin_name }}
 
-{% for path_name, path_conf in plugin_vars.pathes.items() %}
-{{ sls }}~copy_plugin_pathes_{{ plugin_name }}_{{ path_name }}:
+{% for path_name, path_conf in plugin_vars.paths.items() %}
+{{ sls }}~copy_plugin_paths_{{ plugin_name }}_{{ path_name }}:
   file.copy:
     - name: {{ flume.dirs.plugins_d }}/{{ plugin_name }}/{{ path_conf.dest }}
     - source: {{ flume.download.path }}/{{ plugin_name }}/{{ path_conf.src }}

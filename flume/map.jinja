@@ -54,7 +54,7 @@
 # Update classpath with extra plugins.
 # In case the plugin doesn't follow Flume plugins convention.
 {% for plugin_name, plugin_vars in flume.plugins.items() %}
-    {% for path_name, path_conf in plugin_vars.pathes.items() %}
+    {% for path_name, path_conf in plugin_vars.paths.items() %}
         {% for classpath in path_conf.classpath | default([]) %}
             {% do flume.env.classpath.append(
                 '%s/%s/%s/%s' % (flume.dirs.plugins_d, plugin_name, path_conf.dest, classpath)
