@@ -41,9 +41,7 @@ flume:
       file_extension: service
       vars:
         restart: always
-        restart_sec: 3
-    init:
-      dir: /etc/init.d/flume
+        restart_sec: 5
 
   plugins:
     hadoop:
