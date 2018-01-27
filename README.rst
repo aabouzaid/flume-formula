@@ -1,7 +1,8 @@
 ============
 Apache Flume
 ============
-Install and configure `Apache Flume <https://flume.apache.org/>`_ a distributed, reliable, and available service for efficiently collecting, aggregating, and moving large amounts of log data.
+Install and configure `Apache Flume <https://flume.apache.org/>`_ a distributed, reliable,
+and available service for efficiently collecting, aggregating, and moving large amounts of log data.
 
 .. Note::
 
@@ -74,7 +75,8 @@ Plugins
 -------
 More Flume plugins (i.e. external libs) could be added under ``plugins`` section.
 
-If the plugin doesn't follow [Flume convention](https://flume.apache.org/FlumeUserGuide.html#directory-layout-for-plugins),
+If the plugin doesn't follow `Flume convention
+<https://flume.apache.org/FlumeUserGuide.html#directory-layout-for-plugins>`_,
 then the non-standard dirs should be exposed in ``classpath`` section.
 
 If the plugin does follow the convention, then no need to ``classpath`` section.
